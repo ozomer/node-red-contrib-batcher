@@ -1,0 +1,79 @@
+<!--
+  Copyright 2015 Awear Solutions Ltd
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<script type="text/x-red" data-template-name="chunkifier">
+  <div class="form-row">
+    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name" />
+  </div>
+  <div class="form-row" id="node-maxTopics">
+    <label for="node-input-maxTopics">Max Topics</label>
+    <input type="text" id="node-input-maxTopics" placeholder="Maximal number of topics to cache" />
+  </div>
+  <div class="form-row" id="node-maxMessagesPerTopic">
+    <label for="node-input-maxMessagesPerTopic">Max Messages Per Topic</label>
+    <input type="text" id="node-input-maxMessagesPerTopic" placeholder="Maximal number of messages per topic to cache" />
+  </div>
+  <div class="form-row" id="node-maxDelay">
+    <label for="node-input-maxDelay">Max Delay (ms)</label>
+    <input type="text" id="node-input-maxDelay" placeholder="Maximal time that a message can wait in cache (milliseconds)" />
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="chunkifier">
+  <p>Collects message payloads by topic and sends them in chunk (array) when:</p>
+  <p>
+    <ul>
+      <li>The number of messages in the given topic reaches the configured maximal value.</li>
+      <li>The number of unique topics in cache crosses the configured limit (flushes the topic of the oldest message in the cache).</li>
+      <li>A message with a non-true payload (false, null, undefined, empty-string...) arrives. If the topic is non-true, all the cache will be flushed, otherwise only the given topic will be flushed.</li>
+      <li>The oldest message in cache of a given topic waits for more than the maximal delay time (use a negative value to disable feature).</li>
+    </ul>
+  </p>
+</script>
+
+<script type="text/javascript">
+RED.nodes.registerType('chunkifier', {
+  category: 'function',
+  defaults: {
+    name: {
+      value: ""
+    },
+    maxTopics: {
+      value: 1,
+      validator: RED.validators.number()
+    },
+    maxMessagesPerTopic: {
+      value: 10,
+      validator: RED.validators.number()
+    },
+    maxDelay: {
+      value: -1,
+      validator: RED.validators.number()
+    }
+  },
+  color: "rgb(235, 176, 100)",
+  inputs: 1,
+  outputs: 1,
+  icon: "chunkifier.png",
+  label: function() {
+    return this.name || "chunkifier";
+  },
+  labelStyle: function() {
+    return (this.name?"node_label_italic":"");
+  }
+});
+</script>

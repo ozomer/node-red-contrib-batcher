@@ -1,0 +1,33 @@
+{
+  "name"         : "node-red-contrib-chunkifier",
+  "version"      : "0.0.1",
+  "description"  : "Collects sequences of payloads and send them in a single message.",
+  "homepage"     : "https://github.com/ozomer/node-red-contrib-chunkifier",
+  "license"      : "Apache-v2.0",
+  "repository"   : {
+    "type":"git",
+    "url":"https://github.com/ozomer/node-red-contrib-chunkifier.git"
+  },
+  "dependencies": {},
+  "keywords": [
+    "state", 
+    "node-red"
+  ],
+  "node-red": {
+    "nodes": {
+      "chunkifier": "chunkifier.js"
+    }
+  },
+  "bugs": {
+    "url": "https://github.com/ozomer/node-red-contrib-chunkifier/issues"
+  },
+  "author": {
+    "name": "Oren Zomer",
+    "email": "oren.zomer@gmail.com"
+  },
+  "jshintConfig": {
+    "undef": true,
+    "unused": true,
+    "node": true
+  }
+}
