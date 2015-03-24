@@ -59,23 +59,23 @@ module.exports = function(RED) {
 
       if (msg.payload) {
         // Add msg.payload
-        if (!(topic in this.topics)) {
-          this.topics[topic] = {
+        if (!(topic in node.topics)) {
+          node.topics[topic] = {
             "payloads": []
           };
-          if (this.maxDelay >= 0) {
-            var topicObject = this.topics[topic];
-            this.topics[topic].timeout = setTimeout(function() {
+          if (node.maxDelay >= 0) {
+            var topicObject = node.topics[topic];
+            node.topics[topic].timeout = setTimeout(function() {
               // Safety check - topic object not replaced.
-              if (topicObject == this.topics[topic]) {
+              if (topicObject == node.topics[topic]) {
                 delete topicObject.timeout;
                 flushTopic(topic);
               }
-            }, this.maxDelay);
+            }, node.maxDelay);
           }
-          this.topicsCount++;
-          if (this.topicsCount > this.maxTopics) {
-            for (var oldestTopic in this.topics) {
+          node.topicsCount++;
+          if (node.topicsCount > node.maxTopics) {
+            for (var oldestTopic in node.topics) {
               if (oldestTopic[0] == '#') {
                 flushTopic(oldestTopic);
                 break;
@@ -83,8 +83,8 @@ module.exports = function(RED) {
             }
           }
         }
-        this.topics[topic].payloads.push(msg.payload);
-        if (this.topics[topic].payloads.length >= this.maxMessagesPerTopic) {
+        node.topics[topic].payloads.push(msg.payload);
+        if (node.topics[topic].payloads.length >= node.maxMessagesPerTopic) {
           flushTopic(topic);
         }
       } else {
