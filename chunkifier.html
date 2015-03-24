@@ -54,15 +54,15 @@ RED.nodes.registerType('chunkifier', {
     },
     maxTopics: {
       value: 1,
-      validator: RED.validators.number()
+      validate: RED.validators.number()
     },
     maxMessagesPerTopic: {
       value: 10,
-      validator: RED.validators.number()
+      validate: RED.validators.number()
     },
     maxDelay: {
       value: -1,
-      validator: RED.validators.number()
+      validate: RED.validators.number()
     }
   },
   color: "rgb(235, 176, 100)",
