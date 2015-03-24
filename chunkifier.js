@@ -17,7 +17,7 @@
 module.exports = function(RED) {
   "use strict";
 
-  RED.nodes.registerType("collector", function ChunkifierNode(n) {
+  RED.nodes.registerType("chunkifier", function ChunkifierNode(n) {
     RED.nodes.createNode(this,n);
     this.name = n.name;
     this.maxTopics = Math.max(1, parseInt(n.maxTopics) || 0);
