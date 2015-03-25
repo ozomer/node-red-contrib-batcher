@@ -14,7 +14,7 @@
   limitations under the License.
 -->
 
-<script type="text/x-red" data-template-name="chunkifier">
+<script type="text/x-red" data-template-name="batcher">
   <div class="form-row">
     <label for="node-input-name"><i class="icon-tag"></i> Name</label>
     <input type="text" id="node-input-name" placeholder="Name" />
@@ -33,7 +33,7 @@
   </div>
 </script>
 
-<script type="text/x-red" data-help-name="chunkifier">
+<script type="text/x-red" data-help-name="batcher">
   <p>Collects message payloads by topic and sends them in chunk (array) when:</p>
   <p>
     <ul>
@@ -46,7 +46,7 @@
 </script>
 
 <script type="text/javascript">
-RED.nodes.registerType('chunkifier', {
+RED.nodes.registerType('batcher', {
   category: 'function',
   defaults: {
     name: {
@@ -68,9 +68,9 @@ RED.nodes.registerType('chunkifier', {
   color: "rgb(235, 176, 100)",
   inputs: 1,
   outputs: 1,
-  icon: "chunkifier.png",
+  icon: "batcher.png",
   label: function() {
-    return this.name || "chunkifier";
+    return this.name || "batcher";
   },
   labelStyle: function() {
     return (this.name?"node_label_italic":"");

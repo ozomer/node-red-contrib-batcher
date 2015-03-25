@@ -1,4 +1,4 @@
-# node-red-contrib-chunkifier
+# node-red-contrib-batcher
 Node-RED node that collects sequences of payloads and send them in a single message.
 
 
