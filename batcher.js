@@ -93,7 +93,12 @@ module.exports = function(RED) {
               }
             }, node.maxDelay);
           }
+
+          if (node.newestTopic) {
+            node.batches[node.newestTopic].newerTopic = topic;
+          }
           node.newestTopic = topic;
+
           if (!node.oldestTopic) {
             node.oldestTopic = topic;
           }
