@@ -2,7 +2,7 @@
 Node-RED node that collects sequences of payloads and send them in a single message.
 
 
-Collects message payloads by topic and sends them in chunk (array) when:
+Collects message payloads by topic and sends them in a batch (array) when:
 
 * The number of messages in the given topic reaches the configured maximal value.
 * The number of unique topics in cache crosses the configured limit (flushes the topic of the oldest message in the cache).
