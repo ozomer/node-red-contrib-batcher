@@ -110,15 +110,11 @@ RED.nodes.registerType('debouncer', {
       value: ""
     },
     maxTopics: {
-      value: 1,
+      value: 1000000,
       validate: RED.validators.number()
     },
-    maxMessagesPerTopic: {
-      value: 10,
-      validate: RED.validators.number()
-    },
-    maxDelay: {
-      value: -1,
+    interval: {
+      value: 1000,
       validate: RED.validators.number()
     }
   },
