@@ -328,7 +328,7 @@ module.exports = function(RED) {
           node.send(msg);
         } else {
           batch.messages.push(msg);
-          if (node.batches.get(topic).messages.length >= node.maxMessagesPerTopic) {
+          if (batch.messages.length >= node.maxMessagesPerTopic) {
             flushTopic(topic);
           }
         }
