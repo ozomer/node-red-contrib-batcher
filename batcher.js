@@ -1,3 +1,4 @@
+/* jshint esversion: 6 */
 /**
  * Copyright 2015 Awear Solutions Ltd
  *
@@ -25,7 +26,7 @@ module.exports = function(RED) {
     this.maxDelay = (n.maxDelay * 1) || 0;
 
     this.topicCount = 0;
-    this.batches = {};
+    this.batches = new Map();
     // Maintain a linked-list of topics.
     this.oldestTopic = null;
     this.newestTopic = null;
@@ -33,7 +34,7 @@ module.exports = function(RED) {
     var node = this;
 
     function flushTopic(topic) {
-      var batch = node.batches[topic];
+      var batch = node.batches.get(topic);
       if (!batch) {
         return;
       }
@@ -44,18 +45,18 @@ module.exports = function(RED) {
       var newerTopic = batch.newerTopic;
       var olderTopic = batch.olderTopic;
       if (newerTopic) {
-        node.batches[newerTopic].olderTopic = olderTopic;
+        node.batches.get(newerTopic).olderTopic = olderTopic;
       } else { // it's the newest topic
         node.newestTopic = olderTopic;
       }
       if (olderTopic) {
-        node.batches[olderTopic].newerTopic = newerTopic;
+        node.batches.get(olderTopic).newerTopic = newerTopic;
       } else { // it's the oldest topic
         node.oldestTopic = newerTopic;
       }
 
       node.topicCount--;
-      delete node.batches[topic];
+      node.batches.delete(topic);
 
       node.send({
         "topic": topic.slice(1), // remove '#'
@@ -73,21 +74,22 @@ module.exports = function(RED) {
       // Save topics with a leading '#' to avoid javascript internals
       // (for example, a topic named "hasOwnProperty").
       // Also avoids treating empty strings as false values.
-      var topic = '#' + ((msg.topic)?(msg.topic):'');
+      var topic = '' + ((msg.topic)?(msg.topic):'');
 
       if (msg.payload) {
         // Add msg.payload
-        var batch = node.batches[topic];
+        var batch = node.batches.get(topic);
         if (!batch) {
-          node.batches[topic] = batch = {
+          batch = {
             "payloads": [],
             "olderTopic": node.newestTopic,
             "newerTopic": null
           };
+          node.batches.set(topic, batch);
           if (node.maxDelay >= 0) {
             batch.timeout = setTimeout(function() {
               // Safety check - batch object not replaced.
-              if (batch == node.batches[topic]) {
+              if (batch == node.batches.get(topic)) {
                 delete batch.timeout;
                 flushTopic(topic);
               }
@@ -95,7 +97,7 @@ module.exports = function(RED) {
           }
 
           if (node.newestTopic) {
-            node.batches[node.newestTopic].newerTopic = topic;
+            node.batches.get(node.newestTopic).newerTopic = topic;
           }
           node.newestTopic = topic;
 
@@ -109,12 +111,12 @@ module.exports = function(RED) {
           }
         }
         batch.payloads.push(msg.payload);
-        if (node.batches[topic].payloads.length >= node.maxMessagesPerTopic) {
+        if (node.batches.get(topic).payloads.length >= node.maxMessagesPerTopic) {
           flushTopic(topic);
         }
       } else {
         // flush topic
-        if (topic != '#') {
+        if (!!topic) {
           flushTopic(topic);
         } else {
           flushAllTopics();
@@ -135,7 +137,7 @@ module.exports = function(RED) {
     this.interval = (n.interval * 1) || 0;
 
     this.topicCount = 0;
-    this.debounces = {};
+    this.debounces = new Map();
     // Maintain a linked-list of topics.
     this.oldestTopic = null;
     this.newestTopic = null;
@@ -143,7 +145,7 @@ module.exports = function(RED) {
     var node = this;
 
     function flushTopic(topic) {
-      var debounce = node.debounces[topic];
+      var debounce = node.debounces.get(topic);
       if (!debounce) {
         return;
       }
@@ -154,18 +156,18 @@ module.exports = function(RED) {
       var newerTopic = debounce.newerTopic;
       var olderTopic = debounce.olderTopic;
       if (newerTopic) {
-        node.debounces[newerTopic].olderTopic = olderTopic;
+        node.debounces(newerTopic).olderTopic = olderTopic;
       } else { // it's the newest topic
         node.newestTopic = olderTopic;
       }
       if (olderTopic) {
-        node.debounces[olderTopic].newerTopic = newerTopic;
+        node.debounces(olderTopic).newerTopic = newerTopic;
       } else { // it's the oldest topic
         node.oldestTopic = newerTopic;
       }
 
       node.topicCount--;
-      delete node.debounces[topic];
+      node.debounces.delete(topic);
 
       node.send(debounce.message);
     }
@@ -180,26 +182,27 @@ module.exports = function(RED) {
       // Save topics with a leading '#' to avoid javascript internals
       // (for example, a topic named "hasOwnProperty").
       // Also avoids treating empty strings as false values.
-      var topic = '#' + ((msg.topic)?(msg.topic):'');
+      var topic = '' + ((msg.topic)?(msg.topic):'');
 
       if (msg.payload) {
         // Add msg
-        var debounce = node.debounces[topic];
+        var debounce = node.debounces.get(topic);
         if (!debounce) {
-          node.debounces[topic] = debounce = {
+          debounce = {
             "olderTopic": node.newestTopic,
             "newerTopic": null
           };
+          node.debounces.set(topic, debounce);
           debounce.timeout = setTimeout(function() {
             // Safety check - debounce object not replaced.
-            if (debounce == node.debounces[topic]) {
+            if (debounce == node.debounces.get(topic)) {
               delete debounce.timeout;
               flushTopic(topic);
             }
           }, node.interval);
 
           if (node.newestTopic) {
-            node.debounces[node.newestTopic].newerTopic = topic;
+            node.debounces.get(node.newestTopic).newerTopic = topic;
           }
           node.newestTopic = topic;
 
@@ -215,7 +218,7 @@ module.exports = function(RED) {
         debounce.message = msg;
       } else {
         // flush topic
-        if (topic != '#') {
+        if (!!topic) {
           flushTopic(topic);
         } else {
           flushAllTopics();
