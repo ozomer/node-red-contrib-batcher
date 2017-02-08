@@ -38,7 +38,7 @@ module.exports = function(RED) {
       if (!batch) {
         return;
       }
-      if (batch.timeout) {
+      if (!!batch.timeout) {
         clearTimeout(batch.timeout);
       }
       // Remove from linked-list.
@@ -149,7 +149,7 @@ module.exports = function(RED) {
       if (!debounce) {
         return;
       }
-      if (debounce.timeout) {
+      if (!!debounce.timeout) {
         clearTimeout(debounce.timeout);
       }
       // Remove from linked-list.
@@ -252,8 +252,8 @@ module.exports = function(RED) {
       if (!batch) {
         return;
       }
-      if (batch.interval) {
-        clearTimeout(batch.iterval);
+      if (!!batch.interval) {
+        clearInterval(batch.iterval);
         batch.interval = null;
       }
       // Remove from linked-list.
