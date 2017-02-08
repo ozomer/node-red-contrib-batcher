@@ -1,6 +1,6 @@
 {
   "name"         : "node-red-contrib-batcher",
-  "version"      : "0.2.3",
+  "version"      : "0.2.4",
   "description"  : "Collects sequences of payloads and send them in a single message.",
   "homepage"     : "https://github.com/ozomer/node-red-contrib-batcher",
   "license"      : "Apache-v2.0",

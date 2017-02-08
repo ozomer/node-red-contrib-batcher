@@ -324,10 +324,13 @@ module.exports = function(RED) {
           if (node.topicCount > node.maxTopics) {
             flushTopic(node.oldestTopic);
           }
-        }
-        batch.messages.push(msg);
-        if (node.batches.get(topic).messages.length >= node.maxMessagesPerTopic) {
-          flushTopic(topic);
+
+          node.send(msg);
+        } else {
+          batch.messages.push(msg);
+          if (node.batches.get(topic).messages.length >= node.maxMessagesPerTopic) {
+            flushTopic(topic);
+          }
         }
       } else {
         // flush topic
