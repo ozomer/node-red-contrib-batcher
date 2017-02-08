@@ -71,6 +71,33 @@ The debouncer node is very similar to the batcher node, but instead of saving al
 </p>
 </script>
 
+<script type="text/x-red" data-template-name="rate-limit">
+<div class="form-row">
+  <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+  <input type="text" id="node-input-name" placeholder="Name" />
+</div>
+<div class="form-row" id="node-maxTopics">
+  <label for="node-input-maxTopics">Max Topics</label>
+  <input type="text" id="node-input-maxTopics" placeholder="Maximal number of topics to cache" />
+</div>
+  <div class="form-row" id="node-interval">
+  <label for="node-input-interval">Interval (ms)</label>
+  <input type="number" id="node-input-interval" placeholder="Minimal time between messages of the same topic (milliseconds)" />
+</div>
+</script>
+
+<script type="text/x-red" data-help-name="rate-limit">
+<p>
+When a message with a new topic arrives, the message is sent and a new interval is created.<br/>
+When a new message with the same topic arrives and the interval is running, it is added to a queue.<br/>
+On each interval tick, the next message in the queue is sent.
+If there are no more messages in the queue, the interval is cleared.<br/>
+If a message with a non-true payload arrives all messages will be flushed immediately (for the topic of that message).
+If the topic is non-true, this will be done for all topics.<br/>
+</p>
+</script>
+
+
 <script type="text/javascript">
 RED.nodes.registerType('batcher', {
   category: 'function',
@@ -124,6 +151,37 @@ RED.nodes.registerType('debouncer', {
   icon: "timer.png",
   label: function() {
     return this.name || "debouncer";
+  },
+  labelStyle: function() {
+    return (this.name?"node_label_italic":"");
+  }
+});
+
+RED.nodes.registerType('rate-limit', {
+  category: 'function',
+  defaults: {
+    name: {
+      value: ""
+    },
+    maxTopics: {
+      value: 1000000,
+      validate: RED.validators.number()
+    },
+    maxMessagesPerTopic: {
+      value: 1000000,
+      validate: RED.validators.number()
+    },
+    interval: {
+      value: 1000,
+      validate: RED.validators.number()
+    }
+  },
+  color: "rgb(218, 150, 144)",
+  inputs: 1,
+  outputs: 1,
+  icon: "timer.png",
+  label: function() {
+    return this.name || "rate-limit";
   },
   labelStyle: function() {
     return (this.name?"node_label_italic":"");

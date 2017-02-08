@@ -231,4 +231,124 @@ module.exports = function(RED) {
     });
 
   });
+
+  RED.nodes.registerType("rate-limit", function RateLimitNode(n) {
+    RED.nodes.createNode(this,n);
+    this.name = n.name;
+    this.maxTopics = Math.max(1, parseInt(n.maxTopics) || 0);
+    this.maxMessagesPerTopic = Math.max(1, parseInt(n.maxMessagesPerTopic) || 0);
+    this.interval = (n.interval * 1) || 0;
+
+    this.topicCount = 0;
+    this.batches = new Map();
+    // Maintain a linked-list of topics.
+    this.oldestTopic = null;
+    this.newestTopic = null;
+
+    var node = this;
+
+    function flushTopic(topic) {
+      var batch = node.batches.get(topic);
+      if (!batch) {
+        return;
+      }
+      if (batch.interval) {
+        clearTimeout(batch.iterval);
+        batch.interval = null;
+      }
+      // Remove from linked-list.
+      var newerTopic = batch.newerTopic;
+      var olderTopic = batch.olderTopic;
+      if (newerTopic) {
+        node.batches.get(newerTopic).olderTopic = olderTopic;
+      } else { // it's the newest topic
+        node.newestTopic = olderTopic;
+      }
+      if (olderTopic) {
+        node.batches.get(olderTopic).newerTopic = newerTopic;
+      } else { // it's the oldest topic
+        node.oldestTopic = newerTopic;
+      }
+
+      node.topicCount--;
+      node.batches.delete(topic);
+
+      batch.messages.forEach(function(nextMessage) {
+        node.send(nextMessage);
+      });
+    }
+
+    function flushAllTopics() {
+      while (node.oldestTopic) {
+        flushTopic(node.oldestTopic);
+      }
+    }
+
+    this.on("input", function(msg) {
+      // Save topics with a leading '#' to avoid javascript internals
+      // (for example, a topic named "hasOwnProperty").
+      // Also avoids treating empty strings as false values.
+      var topic = '' + ((msg.topic)?(msg.topic):'');
+
+      if (msg.payload) {
+        // Add msg.payload
+        var batch = node.batches.get(topic);
+        if (!batch) {
+          batch = {
+            "messages": [],
+            "olderTopic": node.newestTopic,
+            "newerTopic": null
+          };
+          node.batches.set(topic, batch);
+          batch.interval = setInterval(function() {
+            // Safety check - batch object not replaced.
+            if (batch != node.batches.get(topic)) {
+              if (!!batch.interval) {
+                clearInterval(batch.interval);
+              }
+              batch.interval = null;
+              return;
+            }
+            if (batch.messages.length > 0) {
+              var nextMessage = batch.messages.shift();
+              node.send(nextMessage);
+              return;
+            }
+            flushTopic(topic);
+          }, node.interval);
+
+          if (node.newestTopic) {
+            node.batches.get(node.newestTopic).newerTopic = topic;
+          }
+          node.newestTopic = topic;
+
+          if (!node.oldestTopic) {
+            node.oldestTopic = topic;
+          }
+          node.topicCount++;
+
+          if (node.topicCount > node.maxTopics) {
+            flushTopic(node.oldestTopic);
+          }
+        }
+        batch.messages.push(msg);
+        if (node.batches.get(topic).messages.length >= node.maxMessagesPerTopic) {
+          flushTopic(topic);
+        }
+      } else {
+        // flush topic
+        if (!!topic) {
+          flushTopic(topic);
+        } else {
+          flushAllTopics();
+        }
+      }
+    });
+
+    this.on("close", function() {
+      flushAllTopics();
+    });
+
+  });
+
 };
