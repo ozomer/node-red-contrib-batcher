@@ -1,4 +1,3 @@
-/* jshint esversion: 6 */
 /**
  * Copyright 2015 Awear Solutions Ltd
  *
@@ -14,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+/* jshint esversion: 6 */
 
 module.exports = function(RED) {
   "use strict";
@@ -59,7 +59,7 @@ module.exports = function(RED) {
       node.batches.delete(topic);
 
       node.send({
-        "topic": topic.slice(1), // remove '#'
+        "topic": topic,
         "payload": batch.payloads
       });
     }
@@ -71,9 +71,7 @@ module.exports = function(RED) {
     }
 
     this.on("input", function(msg) {
-      // Save topics with a leading '#' to avoid javascript internals
-      // (for example, a topic named "hasOwnProperty").
-      // Also avoids treating empty strings as false values.
+      // Topic is expected to be a string
       var topic = '' + ((msg.topic)?(msg.topic):'');
 
       if (msg.payload) {
@@ -179,9 +177,7 @@ module.exports = function(RED) {
     }
 
     this.on("input", function(msg) {
-      // Save topics with a leading '#' to avoid javascript internals
-      // (for example, a topic named "hasOwnProperty").
-      // Also avoids treating empty strings as false values.
+      // Topic is expected to be a string
       var topic = '' + ((msg.topic)?(msg.topic):'');
 
       if (msg.payload) {
@@ -285,9 +281,7 @@ module.exports = function(RED) {
     }
 
     this.on("input", function(msg) {
-      // Save topics with a leading '#' to avoid javascript internals
-      // (for example, a topic named "hasOwnProperty").
-      // Also avoids treating empty strings as false values.
+      // Topic is expected to be a string
       var topic = '' + ((msg.topic)?(msg.topic):'');
 
       if (msg.payload) {
