@@ -61,29 +61,33 @@
 </script>
 
 <script type="text/x-red" data-help-name="debouncer">
-<p>
-When a message with a new topic arrives, the message is saved and a new timer is created.<br/>
-When a new message with the same topic arrives before the timer has expired, it replaces the save message.<br/>
-When the timer expires, the last saved message of the topic is sent (and the topic is "forgotten" - will be treated as a "new topic" next time).
-The same will happen if a message with a non-true payload arrives (for the topic of that message). If the topic is non-true, this will be done for all topics.<br/>
-If the number of timers (i.e. unique topics) crosses the configured limit, the timer of the oldest topic will be cleared and its message will be sent.<br/>
-The debouncer node is very similar to the batcher node, but instead of saving all the messages it saves only the last message.
-</p>
+  <p>
+    When a message with a new topic arrives, the message is saved and a new timer is created.<br/>
+    When a new message with the same topic arrives before the timer has expired, it replaces the save message.<br/>
+    When the timer expires, the last saved message of the topic is sent (and the topic is "forgotten" - will be treated as a "new topic" next time).
+    The same will happen if a message with a non-true payload arrives (for the topic of that message). If the topic is non-true, this will be done for all topics.<br/>
+    If the number of timers (i.e. unique topics) crosses the configured limit, the timer of the oldest topic will be cleared and its message will be sent.<br/>
+    The debouncer node is very similar to the batcher node, but instead of saving all the messages it saves only the last message.
+  </p>
 </script>
 
 <script type="text/x-red" data-template-name="rate-limit">
-<div class="form-row">
-  <label for="node-input-name"><i class="icon-tag"></i> Name</label>
-  <input type="text" id="node-input-name" placeholder="Name" />
-</div>
-<div class="form-row" id="node-maxTopics">
-  <label for="node-input-maxTopics">Max Topics</label>
-  <input type="text" id="node-input-maxTopics" placeholder="Maximal number of topics to cache" />
-</div>
+  <div class="form-row">
+    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name" />
+  </div>
+  <div class="form-row" id="node-maxTopics">
+    <label for="node-input-maxTopics">Max Topics</label>
+    <input type="text" id="node-input-maxTopics" placeholder="Maximal number of topics to cache" />
+  </div>
+  <div class="form-row" id="node-maxMessagesPerTopic">
+    <label for="node-input-maxMessagesPerTopic">Max Messages Per Topic</label>
+    <input type="number" id="node-input-maxMessagesPerTopic" placeholder="Maximal number of messages per topic to cache" />
+  </div>
   <div class="form-row" id="node-interval">
-  <label for="node-input-interval">Interval (ms)</label>
-  <input type="number" id="node-input-interval" placeholder="Minimal time between messages of the same topic (milliseconds)" />
-</div>
+    <label for="node-input-interval">Interval (ms)</label>
+    <input type="number" id="node-input-interval" placeholder="Minimal time between messages of the same topic (milliseconds)" />
+  </div>
 </script>
 
 <script type="text/x-red" data-help-name="rate-limit">
