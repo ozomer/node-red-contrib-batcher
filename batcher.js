@@ -154,12 +154,12 @@ module.exports = function(RED) {
       var newerTopic = debounce.newerTopic;
       var olderTopic = debounce.olderTopic;
       if (newerTopic) {
-        node.debounces(newerTopic).olderTopic = olderTopic;
+        node.debounces.get(newerTopic).olderTopic = olderTopic;
       } else { // it's the newest topic
         node.newestTopic = olderTopic;
       }
       if (olderTopic) {
-        node.debounces(olderTopic).newerTopic = newerTopic;
+        node.debounces.get(olderTopic).newerTopic = newerTopic;
       } else { // it's the oldest topic
         node.oldestTopic = newerTopic;
       }
