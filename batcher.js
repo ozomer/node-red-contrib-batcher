@@ -233,6 +233,8 @@ module.exports = function(RED) {
     this.name = n.name;
     this.maxTopics = Math.max(1, parseInt(n.maxTopics) || 0);
     this.maxMessagesPerTopic = Math.max(1, parseInt(n.maxMessagesPerTopic) || 0);
+    this.dropOverflowMessages = !!n.dropOverflowMessages;
+
     this.interval = (n.interval * 1) || 0;
 
     this.topicCount = 0;
@@ -287,6 +289,15 @@ module.exports = function(RED) {
       if (msg.payload) {
         // Add msg.payload
         var batch = node.batches.get(topic);
+        if (batch && (batch.messages.length >= node.maxMessagesPerTopic)) {
+          // batch is full
+          if (node.dropOverflowMessages) {
+            return; // drop message
+          }
+          flushTopic(topic);
+          batch = null;
+        }
+
         if (!batch) {
           batch = {
             "messages": [],
@@ -328,9 +339,6 @@ module.exports = function(RED) {
           node.send(msg);
         } else {
           batch.messages.push(msg);
-          if (batch.messages.length >= node.maxMessagesPerTopic) {
-            flushTopic(topic);
-          }
         }
       } else {
         // flush topic

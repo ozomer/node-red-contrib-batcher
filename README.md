@@ -17,3 +17,6 @@ New in version 0.2:
 
 * Using Maps instead of objects.
 * Rate-Limit Node. Limit the rate of messages per topic.
+
+N32 in version 0.3:
+* Drop Overflow Messages for rate-limit.
