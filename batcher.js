@@ -232,7 +232,7 @@ module.exports = function(RED) {
     RED.nodes.createNode(this,n);
     this.name = n.name;
     this.maxTopics = Math.max(1, parseInt(n.maxTopics) || 0);
-    this.maxMessagesPerTopic = Math.max(1, parseInt(n.maxMessagesPerTopic) || 0);
+    this.maxMessagesPerTopic = Math.max(0, parseInt(n.maxMessagesPerTopic) || 0);
     this.dropOverflowMessages = !!n.dropOverflowMessages;
 
     this.interval = (n.interval * 1) || 0;
