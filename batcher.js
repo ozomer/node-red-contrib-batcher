@@ -179,7 +179,7 @@ module.exports = function(RED) {
 
       if (msg.payload) {
         // Add msg
-        const debounce = node.debounces.get(topic);
+        let debounce = node.debounces.get(topic);
         if (!debounce) {
           debounce = {
             "olderTopic": node.newestTopic,
