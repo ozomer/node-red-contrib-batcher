@@ -9,6 +9,8 @@ Collects message payloads by topic and sends them in a batch (array) when:
 * A message with a non-true payload (false, null, undefined, empty-string...) arrives. If the topic is non-true, all the cache will be flushed, otherwise only the given topic will be flushed.
 * The oldest message in cache of a given topic waits for more than the maximal delay time (use a negative value to disable feature).
 
+Supports Node.JS 6.x and above.
+
 New in version 0.1:
 
 * Debouncer Node. Very similar to the batcher node, but saves and sends only the latest message.
@@ -24,5 +26,5 @@ New in version 0.3:
 
 New in version 0.4:
 
-* Using `const`s and `let`s instead of `var`s, arrow-functions and template strings.
+* Using `const`s and `let`s instead of `var`s, arrow-functions and template strings. Dropped support for Node.JS before verison 6.x.
 * Fixing cpu leak in rate-limit due to typo.
