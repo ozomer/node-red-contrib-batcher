@@ -31,19 +31,19 @@ module.exports = function(RED) {
     this.oldestTopic = null;
     this.newestTopic = null;
 
-    var node = this;
+    const node = this;
 
     function flushTopic(topic) {
-      var batch = node.batches.get(topic);
+      const batch = node.batches.get(topic);
       if (!batch) {
         return;
       }
-      if (!!batch.timeout) {
+      if (batch.timeout) {
         clearTimeout(batch.timeout);
       }
       // Remove from linked-list.
-      var newerTopic = batch.newerTopic;
-      var olderTopic = batch.olderTopic;
+      const newerTopic = batch.newerTopic;
+      const olderTopic = batch.olderTopic;
       if (newerTopic) {
         node.batches.get(newerTopic).olderTopic = olderTopic;
       } else { // it's the newest topic
@@ -72,11 +72,11 @@ module.exports = function(RED) {
 
     this.on("input", function(msg) {
       // Topic is expected to be a string
-      var topic = '' + ((msg.topic)?(msg.topic):'');
+      const topic = `${msg.topic || ''}`;
 
       if (msg.payload) {
         // Add msg.payload
-        var batch = node.batches.get(topic);
+        let batch = node.batches.get(topic);
         if (!batch) {
           batch = {
             "payloads": [],
@@ -85,9 +85,9 @@ module.exports = function(RED) {
           };
           node.batches.set(topic, batch);
           if (node.maxDelay >= 0) {
-            batch.timeout = setTimeout(function() {
+            batch.timeout = setTimeout(() => {
               // Safety check - batch object not replaced.
-              if (batch == node.batches.get(topic)) {
+              if (batch === node.batches.get(topic)) {
                 delete batch.timeout;
                 flushTopic(topic);
               }
@@ -114,7 +114,7 @@ module.exports = function(RED) {
         }
       } else {
         // flush topic
-        if (!!topic) {
+        if (topic) {
           flushTopic(topic);
         } else {
           flushAllTopics();
@@ -122,10 +122,7 @@ module.exports = function(RED) {
       }
     });
 
-    this.on("close", function() {
-      flushAllTopics();
-    });
-
+    this.on("close", flushAllTopics);
   });
 
   RED.nodes.registerType("debouncer", function DebouncerNode(n) {
@@ -140,19 +137,19 @@ module.exports = function(RED) {
     this.oldestTopic = null;
     this.newestTopic = null;
 
-    var node = this;
+    const node = this;
 
     function flushTopic(topic) {
-      var debounce = node.debounces.get(topic);
+      const debounce = node.debounces.get(topic);
       if (!debounce) {
         return;
       }
-      if (!!debounce.timeout) {
+      if (debounce.timeout) {
         clearTimeout(debounce.timeout);
       }
       // Remove from linked-list.
-      var newerTopic = debounce.newerTopic;
-      var olderTopic = debounce.olderTopic;
+      const newerTopic = debounce.newerTopic;
+      const olderTopic = debounce.olderTopic;
       if (newerTopic) {
         node.debounces.get(newerTopic).olderTopic = olderTopic;
       } else { // it's the newest topic
@@ -178,20 +175,20 @@ module.exports = function(RED) {
 
     this.on("input", function(msg) {
       // Topic is expected to be a string
-      var topic = '' + ((msg.topic)?(msg.topic):'');
+      const topic = `${msg.topic || ''}`;
 
       if (msg.payload) {
         // Add msg
-        var debounce = node.debounces.get(topic);
+        const debounce = node.debounces.get(topic);
         if (!debounce) {
           debounce = {
             "olderTopic": node.newestTopic,
             "newerTopic": null
           };
           node.debounces.set(topic, debounce);
-          debounce.timeout = setTimeout(function() {
+          debounce.timeout = setTimeout(() => {
             // Safety check - debounce object not replaced.
-            if (debounce == node.debounces.get(topic)) {
+            if (debounce === node.debounces.get(topic)) {
               delete debounce.timeout;
               flushTopic(topic);
             }
@@ -214,7 +211,7 @@ module.exports = function(RED) {
         debounce.message = msg;
       } else {
         // flush topic
-        if (!!topic) {
+        if (topic) {
           flushTopic(topic);
         } else {
           flushAllTopics();
@@ -222,10 +219,7 @@ module.exports = function(RED) {
       }
     });
 
-    this.on("close", function() {
-      flushAllTopics();
-    });
-
+    this.on("close", flushAllTopics);
   });
 
   RED.nodes.registerType("rate-limit", function RateLimitNode(n) {
@@ -243,20 +237,20 @@ module.exports = function(RED) {
     this.oldestTopic = null;
     this.newestTopic = null;
 
-    var node = this;
+    const node = this;
 
     function flushTopic(topic) {
-      var batch = node.batches.get(topic);
+      const batch = node.batches.get(topic);
       if (!batch) {
         return;
       }
-      if (!!batch.interval) {
-        clearInterval(batch.iterval);
+      if (batch.interval) {
+        clearInterval(batch.interval);
         batch.interval = null;
       }
       // Remove from linked-list.
-      var newerTopic = batch.newerTopic;
-      var olderTopic = batch.olderTopic;
+      const newerTopic = batch.newerTopic;
+      const olderTopic = batch.olderTopic;
       if (newerTopic) {
         node.batches.get(newerTopic).olderTopic = olderTopic;
       } else { // it's the newest topic
@@ -271,9 +265,7 @@ module.exports = function(RED) {
       node.topicCount--;
       node.batches.delete(topic);
 
-      batch.messages.forEach(function(nextMessage) {
-        node.send(nextMessage);
-      });
+      batch.messages.forEach(nextMessage => node.send(nextMessage));
     }
 
     function flushAllTopics() {
@@ -284,11 +276,11 @@ module.exports = function(RED) {
 
     this.on("input", function(msg) {
       // Topic is expected to be a string
-      var topic = '' + ((msg.topic)?(msg.topic):'');
+      const topic = `${msg.topic || ''}`;
 
       if (msg.payload) {
         // Add msg.payload
-        var batch = node.batches.get(topic);
+        let batch = node.batches.get(topic);
         if (batch && (batch.messages.length >= node.maxMessagesPerTopic)) {
           // batch is full
           if (node.dropOverflowMessages) {
@@ -305,17 +297,17 @@ module.exports = function(RED) {
             "newerTopic": null
           };
           node.batches.set(topic, batch);
-          batch.interval = setInterval(function() {
+          batch.interval = setInterval(() => {
             // Safety check - batch object not replaced.
-            if (batch != node.batches.get(topic)) {
-              if (!!batch.interval) {
+            if (batch !== node.batches.get(topic)) {
+              if (batch.interval) {
                 clearInterval(batch.interval);
               }
               batch.interval = null;
               return;
             }
             if (batch.messages.length > 0) {
-              var nextMessage = batch.messages.shift();
+              const nextMessage = batch.messages.shift();
               node.send(nextMessage);
               return;
             }
@@ -342,7 +334,7 @@ module.exports = function(RED) {
         }
       } else {
         // flush topic
-        if (!!topic) {
+        if (topic) {
           flushTopic(topic);
         } else {
           flushAllTopics();
@@ -350,9 +342,7 @@ module.exports = function(RED) {
       }
     });
 
-    this.on("close", function() {
-      flushAllTopics();
-    });
+    this.on("close", flushAllTopics);
 
   });
 

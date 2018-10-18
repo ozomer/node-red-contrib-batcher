@@ -18,5 +18,11 @@ New in version 0.2:
 * Using Maps instead of objects.
 * Rate-Limit Node. Limit the rate of messages per topic.
 
-N32 in version 0.3:
+New in version 0.3:
+
 * Drop Overflow Messages for rate-limit.
+
+New in version 0.4:
+
+* Using `const`s and `let`s instead of `var`s, arrow-functions and template strings.
+* Fixing cpu leak in rate-limit due to typo.
